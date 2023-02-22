@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+  <style>
+    ul {
+        color: red;
+    }
+
+    label {
+        font-weight: 800;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+  </style>
+{% endblock extra_css %}
+
+{% block content %}
+  <form action="" method="post" class="post-form" novalidate>
+    {% csrf_token %}
+    {{ form.as_div }}
+    <button type="submit" class="btn btn-success">Save</button>
+  </form>
+{% endblock content %}
