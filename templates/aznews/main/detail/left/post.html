@@ -17,13 +17,12 @@
         <a href="#"><i class="fa fa-calendar"></i>{{ post.published_at|date:"d M Y" }}</a>
       </li>
       <li>
-        <a href="#"><i class="fa fa-comments"></i>3 Comments</a>
+        <a href="#"><i class="fa fa-comments"></i>{{ post.latest_comments.count }} Comments</a>
       </li>
       <li>
-        <a href="#"><i class="fa fa-eye"></i>3 Views</a>
+        <a href="#"><i class="fa fa-eye"></i>{{ post.views_count }} Views</a>
       </li>
-
     </ul>
-    {{ post.content|linebreaksbr }}
+    {{ post.content|safe }}
   </div>
 </div>
