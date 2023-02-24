@@ -18,8 +18,14 @@ from django.views.generic import (
     View,
 )
 
-from newspaper_app.forms import CommentForm, ContactForm, NewsletterForm, PostForm
-from newspaper_app.models import Category, Post
+from newspaper_app.forms import (
+    CommentForm,
+    TagForm,
+    ContactForm,
+    NewsletterForm,
+    PostForm,
+)
+from newspaper_app.models import Category, Post, Tag, Category
 
 
 class HomeView(ListView):
@@ -54,10 +60,18 @@ class PostDetailView(DetailView):
     template_name = "aznews/detail.html"
     context_object_name = "post"
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(status="active", published_at__isnull=False)
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+
         # get current post
         obj = self.get_object()
+        obj.views_count += 1
+        obj.save()
+
         # id => 3
         # 2, 1
         context["previous_post"] = (
@@ -238,14 +252,14 @@ class CommentView(View):
 
 class DraftListView(LoginRequiredMixin, ListView):
     model = Post
-    template_name = "news_admin/post_list.html"
+    template_name = "news_admin/draft_list.html"
     context_object_name = "posts"
     queryset = Post.objects.filter(published_at__isnull=True).order_by("-published_at")
 
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
-    success_url = reverse_lazy("post-list")
+    success_url = reverse_lazy("draft-list")
 
     def form_valid(self, form):
         messages.success(self.request, "Post was successfully deleted")
@@ -260,7 +274,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        messages.success(self.request, "Post was successfully deleted")
+        messages.success(self.request, "Post was successfully created.")
         return super().form_valid(form)
 
 
@@ -271,7 +285,7 @@ class PostPublishView(LoginRequiredMixin, View):
         post.published_at = timezone.now()
         post.save()
         messages.success(request, "Post was successfully published")
-        return redirect("post-list")
+        return redirect("post-detail", post.pk)
 
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
@@ -283,3 +297,40 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
 
 def handler404(request, exception, template_name="404.html"):
     return render(request, template_name, status=404)
+
+
+class DraftDetailView(LoginRequiredMixin, DetailView):
+    model = Post
+    template_name = "news_admin/draft_detail.html"
+    context_object_name = "post"
+
+
+##################### Tag  CRUD ###########################
+
+
+class TagListView(LoginRequiredMixin, ListView):
+    model = Tag
+    template_name = "news_admin/tag_list.html"
+    context_object_name = "tags"
+
+
+class TagCreateView(LoginRequiredMixin, CreateView):
+    model = Tag
+    form_class = TagForm
+    template_name = "news_admin/tag_create.html"
+    success_url = reverse_lazy("tag-list")
+
+
+class TagUpdateView(LoginRequiredMixin, UpdateView):
+    model = Tag
+    form_class = TagForm
+    template_name = "news_admin/tag_create.html"
+    success_url = reverse_lazy("tag-list")
+
+
+class TagDeleteView(LoginRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        tag = get_object_or_404(Tag, pk=pk)
+        tag.delete()
+        messages.success(self.request, "Tag was successfully deleted")
+        return redirect("tag-list")
