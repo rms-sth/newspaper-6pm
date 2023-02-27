@@ -21,11 +21,14 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('summernote/', include('django_summernote.urls')),
+    # third party urls
+    path("summernote/", include("django_summernote.urls")),
+    # build in customized urls
     path("accounts/login/", LoginView.as_view(), name="login"),
     path("accounts/logout/", LogoutView.as_view(), name="logout"),
     # custom urls
     path("", include("newspaper_app.urls")),
+    path("api/v1/", include("api.urls")),
 ]
 
 if settings.DEBUG:
