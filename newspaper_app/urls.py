@@ -103,4 +103,25 @@ urlpatterns = [
         views.TagDeleteView.as_view(),
         name="tag-delete",
     ),
+    # category
+    path(
+        "category-list/",
+        views.CategoryListView.as_view(),
+        name="category-list",
+    ),
+    path(
+        "category-create/",
+        views.CategoryCreateView.as_view(),
+        name="category-create",
+    ),
+    path(
+        "category-update/<int:pk>/",
+        views.CategoryUpdateView.as_view(),
+        name="category-update",
+    ),
+    path(
+        "category-delete/<int:pk>/",
+        views.CategoryDeleteView.as_view(),
+        name="category-delete",
+    ),
 ]

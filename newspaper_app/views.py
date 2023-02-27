@@ -24,6 +24,7 @@ from newspaper_app.forms import (
     ContactForm,
     NewsletterForm,
     PostForm,
+    CategoryForm
 )
 from newspaper_app.models import Category, Post, Tag, Category
 
@@ -334,3 +335,34 @@ class TagDeleteView(LoginRequiredMixin, View):
         tag.delete()
         messages.success(self.request, "Tag was successfully deleted")
         return redirect("tag-list")
+
+
+##################### Category  CRUD ###########################
+
+
+class CategoryListView(LoginRequiredMixin, ListView):
+    model = Category
+    template_name = "news_admin/category_list.html"
+    context_object_name = "categorys"
+
+
+class CategoryCreateView(LoginRequiredMixin, CreateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = "news_admin/category_create.html"
+    success_url = reverse_lazy("category-list")
+
+
+class CategoryUpdateView(LoginRequiredMixin, UpdateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = "news_admin/category_create.html"
+    success_url = reverse_lazy("category-list")
+
+
+class CategoryDeleteView(LoginRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        category = get_object_or_404(Category, pk=pk)
+        category.delete()
+        messages.success(self.request, "Category was successfully deleted")
+        return redirect("category-list")

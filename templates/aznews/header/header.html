@@ -24,6 +24,12 @@
                 <ul class="header-social">
                   {% if user.is_authenticated %}
                     <li>
+                      <a href="{% url 'tag-list' %}"><i class="fas fa-tag"></i></a>
+                    </li>
+                    <li>
+                      <a href="{% url 'category-list' %}"><i class="fas fa-newspaper"></i></a>
+                    </li>
+                    <li>
                       <a href="{% url 'post-create' %}"><i class="fas fa-plus"></i></a>
                     </li>
                     <li>
@@ -121,8 +127,8 @@
               <div class="header-right-btn f-right d-none d-lg-block">
                 <i class="fas fa-search special-tag"></i>
                 <div class="search-box">
-                  <form action="#">
-                    <input type="text" placeholder="Search">
+                  <form action="{% url 'post-search' %}" method="get">
+                    <input type="text" placeholder="Search" value="{{ query }}" name="query">
                   </form>
                 </div>
               </div>

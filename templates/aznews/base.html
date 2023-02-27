@@ -95,13 +95,13 @@
                   // back tick => `
                   $("#newsletter_side_message").append(
                       `
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                      <strong>${response.message}</strong>
-                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                      </button>
-                                    </div>
-                                  `)
+                                          <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            <strong>${response.message}</strong>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                        `)
                   setTimeout(function() {
                       $('.alert').alert('close');
                   }, 5000)
@@ -110,13 +110,55 @@
               error: function(response) {
                   $("#newsletter_side_message").append(
                       `
-                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                      <strong>${response.responseJSON.message}</strong>
-                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                      </button>
-                                    </div>
-                                  `)
+                                          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            <strong>${response.responseJSON.message}</strong>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                        `)
+                  setTimeout(function() {
+                      $('.alert').alert('close');
+                  }, 5000)
+              },
+          })
+
+      })
+
+      $("#newsletter_bottom_form").submit(function(e) {
+          e.preventDefault(); // do not perform your current action
+          let serializedData = $(this).serialize(); // convert to bujne form by ajax
+
+          $.ajax({
+              type: "POST",
+              data: serializedData,
+              url: "{% url 'newsletter' %}",
+              success: function(response) {
+                  // back tick => `
+                  $("#newsletter_bottom_message").append(
+                      `
+                                          <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            <strong>${response.message}</strong>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                        `)
+                  setTimeout(function() {
+                      $('.alert').alert('close');
+                  }, 5000)
+                  $("#newsletter_bottom_form").trigger("reset")
+              },
+              error: function(response) {
+                  $("#newsletter_bottom_message").append(
+                      `
+                                          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            <strong>${response.responseJSON.message}</strong>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                        `)
                   setTimeout(function() {
                       $('.alert').alert('close');
                   }, 5000)

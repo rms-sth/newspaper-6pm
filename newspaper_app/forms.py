@@ -1,7 +1,7 @@
 from django import forms
 from django_summernote.widgets import SummernoteInplaceWidget, SummernoteWidget
 
-from newspaper_app.models import Comment, Contact, Newsletter, Post, Tag
+from newspaper_app.models import Category, Comment, Contact, Newsletter, Post, Tag
 
 
 class PostForm(forms.ModelForm):
@@ -57,4 +57,9 @@ class CommentForm(forms.ModelForm):
 class TagForm(forms.ModelForm):
     class Meta:
         model = Tag
+        fields = "__all__"
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
         fields = "__all__"
