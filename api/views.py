@@ -5,10 +5,11 @@ from rest_framework import permissions, viewsets
 from api.serializers import (
     CategorySerializer,
     GroupSerializer,
+    PostSerializer,
     TagSerializer,
     UserSerializer,
 )
-from newspaper_app.models import Category, Tag
+from newspaper_app.models import Category, Post, Tag
 
 # application developers
 # framework / library developers
@@ -68,3 +69,30 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
+class PostViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows tags to be viewed or edited.
+    """
+
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.action in ["list", "retrieve"]:
+            qs = qs.filter(status="active", published_at__isnull=False)
+        return qs
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [
+                permissions.AllowAny(),
+            ]
+        return super().get_permissions()
+
+
+# # homework:
+# 1. PostByCategory
+# 2. PostByTag
+# 3. PostPublish
