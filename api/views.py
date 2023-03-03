@@ -2,7 +2,16 @@ from django.contrib.auth.models import Group, User
 from django.shortcuts import render
 from rest_framework import permissions, viewsets
 
-from api.serializers import GroupSerializer, UserSerializer
+from api.serializers import (
+    CategorySerializer,
+    GroupSerializer,
+    TagSerializer,
+    UserSerializer,
+)
+from newspaper_app.models import Category, Tag
+
+# application developers
+# framework / library developers
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -23,3 +32,39 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows tags to be viewed or edited.
+    """
+
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [
+                permissions.AllowAny(),
+            ]
+        return super().get_permissions()
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows tags to be viewed or edited.
+    """
+
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [
+                permissions.AllowAny(),
+            ]
+        return super().get_permissions()
+
+
