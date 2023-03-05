@@ -1,10 +1,15 @@
 from django.contrib.auth.models import Group, User
 from django.shortcuts import render
-from rest_framework import permissions, viewsets
+from django.utils import timezone
+from rest_framework import permissions, status, viewsets
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api.serializers import (
     CategorySerializer,
     GroupSerializer,
+    PostPublishSerializer,
     PostSerializer,
     TagSerializer,
     UserSerializer,
@@ -92,7 +97,66 @@ class PostViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
+# class PostByCategoryListViewSet(ListAPIView):
+#     serializer_class = PostSerializer
+#     permission_classes = [permissions.AllowAny]
+
+#     def get_queryset(self):
+#         qs = Post.objects.filter(
+#             status="active", published_at__isnull=False, category=self.kwargs["cat_id"]
+#         )
+#         return qs
+
+
+class PostByCategoryListViewSet(ListAPIView):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(
+            status="active", published_at__isnull=False, category=self.kwargs["cat_id"]
+        )
+        return qs
+
+
+class DraftListViewSet(ListAPIView):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(status="active", published_at__isnull=True)
+        return qs
+
+
+class PostPublishViewSet(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostPublishSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            data = serializer.data
+
+            # publish the post
+            post = Post.objects.get(pk=data["post"])
+            post.published_at = timezone.now()
+            post.save()
+
+            serialized_post = PostSerializer(post)
+            return Response(
+                {
+                    "success": "Post was successfully published.",
+                    "data": serialized_post.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+
 # # homework:
-# 1. PostByCategory
+# 1. PostByCategory => done
 # 2. PostByTag
 # 3. PostPublish
