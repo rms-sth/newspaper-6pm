@@ -1,20 +1,22 @@
 from django.contrib.auth.models import Group, User
 from django.shortcuts import render
 from django.utils import timezone
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, status, viewsets, exceptions
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.serializers import (
     CategorySerializer,
+    CommentSerializer,
     GroupSerializer,
+    NewsletterSerializer,
     PostPublishSerializer,
     PostSerializer,
     TagSerializer,
     UserSerializer,
 )
-from newspaper_app.models import Category, Post, Tag
+from newspaper_app.models import Category, Comment, Newsletter, Post, Tag
 
 # application developers
 # framework / library developers
@@ -108,6 +110,19 @@ class PostViewSet(viewsets.ModelViewSet):
 #         return qs
 
 
+class PostByTagListViewSet(ListAPIView):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(
+            status="active", published_at__isnull=False, tag=self.kwargs["tag_id"]
+        )
+        return qs
+
+
 class PostByCategoryListViewSet(ListAPIView):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
@@ -156,7 +171,56 @@ class PostPublishViewSet(APIView):
             )
 
 
+class NewsletterViewSet(viewsets.ModelViewSet):
+    """
+    1. allows admin to view newsletter.
+    2. allows anonymous user to create newsletter
+    3. does not support update method
+    """
+
+    queryset = Newsletter.objects.all()
+    serializer_class = NewsletterSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [
+                permissions.IsAuthenticated(),
+            ]
+        return super().get_permissions()
+
+    def update(self, request, *args, **kwargs):
+        raise exceptions.MethodNotAllowed(request.method)
+
+
+class CommentViewSet(APIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = CommentSerializer
+
+    def get(self, request, post_id, *args, **kwargs):
+        comments = Comment.objects.filter(post=post_id).order_by("-created_at")
+        serializer = self.serializer_class(comments, many=True)
+        return Response(
+            {
+                "success": "Comment was successfully fetched.",
+                "data": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    def post(self, request, post_id, *args, **kwargs):
+        request.data.update({"post": post_id})
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(
+                {
+                    "success": "Comment was successfully created.",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+
 # # homework:
-# 1. PostByCategory => done
-# 2. PostByTag
-# 3. PostPublish
+# 1. ContactUs

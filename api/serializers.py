@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 
-from newspaper_app.models import Category, Comment, Post, Tag
+from newspaper_app.models import Category, Comment, Newsletter, Post, Tag
 
 
 # convert from json to dictionary object and vice-versa
@@ -73,3 +73,15 @@ class PostSerializer(serializers.ModelSerializer):
 
 class PostPublishSerializer(serializers.Serializer):
     post = serializers.IntegerField()
+
+
+class NewsletterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Newsletter
+        fields = "__all__"
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = "__all__"
