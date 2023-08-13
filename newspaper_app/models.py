@@ -78,15 +78,15 @@ class Comment(TimeStampModel):
 ## 1 - 1 Relationship
 # 1 user can have one 1 profile   => 1
 # 1 profile is associated to one 1 user  => 1
-# OneToOneField()
+# OneToOneField() => Can be used in Any Model
 
 
 ## 1 - M Relationship
 # 1 user can post M post  => M
 # 1 post is associated to only 1 user => 1
-# In django use ForeignKey
+# In django use ForeignKey() => Must be used in Many side
 
 ## M - M Relationship
 # 1 student can learn from M teachers => M
 # 1 teacher can teach M students => M
-# ManyToManyField()
+# ManyToManyField() => Can be used in Any Model

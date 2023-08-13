@@ -203,7 +203,7 @@ class NewsletterView(View):
 
     def post(self, request, *args, **kwargs):
         is_ajax = request.headers.get("x-requested-with")
-        if is_ajax == "XMLHttpRequest":  # if ajax ho vane forms save gar
+        if is_ajax == "XMLHttpRequest":  # if ajax ho vane form save gar
             form = self.form_class(request.POST)
             if form.is_valid():
                 form.save()
@@ -218,7 +218,7 @@ class NewsletterView(View):
                 return JsonResponse(
                     {
                         "success": False,
-                        "message": "Something went wrong.",
+                        "message": "Email is not valid.",
                     },
                     status=400,
                 )
